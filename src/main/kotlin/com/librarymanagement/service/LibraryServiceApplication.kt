@@ -8,5 +8,5 @@ import org.springframework.boot.runApplication
 class LibraryServiceApplication
 
 fun main(args: Array<String>) {
-	runApplication<LibraryServiceApplication>(*args)
+    runApplication<LibraryServiceApplication>(*args)
 }

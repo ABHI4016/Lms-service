@@ -11,27 +11,35 @@ import java.util.*
 @Repository
 interface SkuRepository : MongoRepository<Sku, String> {
     fun findByItem(libraryItem: LibraryItem): Optional<Sku>
-    fun findAllWithStockGreaterThan(stock: Int = 0) : List<Sku>
+    fun findByStockGreaterThan(stock: Int = 0): List<Sku>
 }
 
 
 @Service
 class StockService(
-        private val skuRepository: SkuRepository
+        private val skuRepository: SkuRepository,
 ) {
-    fun createSku( sku: Sku): Sku {
-        return if(skuRepository.findByItem(sku.item).isPresent){
+    fun createSku(sku: Sku): Sku {
+        return if (skuRepository.findByItem(sku.item).isPresent) {
             throw SkuAlreadyExistsException("SKU for this item already exists")
-        }else{
+        } else {
             sku.id = null
-            skuRepository.save(sku)
+            skuRepository.insert(sku)
         }
     }
 
-    fun getAllSku(): List<Sku>{
-        return skuRepository.findAllWithStockGreaterThan()
+    fun getAllSku(): List<Sku> {
+        return skuRepository.findByStockGreaterThan()
+    }
+
+    fun findById(skuId: String): Sku {
+        return skuRepository.findById(skuId).orElseThrow{
+            throw SkuNotFoundException("Can't find SKU for id: $skuId")
+        }
     }
 }
+
+class SkuNotFoundException(override val message: String) : Throwable()
 
 class SkuAlreadyExistsException(override val message: String) : Throwable()
 

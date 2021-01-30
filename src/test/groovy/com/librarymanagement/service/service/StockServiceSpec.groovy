@@ -52,7 +52,7 @@ class StockServiceSpec extends Specification {
         def response = stockService.getAllSku()
 
         then:
-        1 * skuRepository.findAllWithStockGreaterThan(0) >> skus
+        1 * skuRepository.findByStockGreaterThan(0) >> skus
         response.size() == 2
     }
 
@@ -61,7 +61,7 @@ class StockServiceSpec extends Specification {
         def response = stockService.getAllSku()
 
         then:
-        1 * skuRepository.findAllWithStockGreaterThan(0) >> []
+        1 * skuRepository.findByStockGreaterThan(0) >> []
         response.size() == 0
     }
 }

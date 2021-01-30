@@ -38,9 +38,10 @@ data class Sku(
         var id: String?,
         @DBRef
         val item: LibraryItem,
-        var stock: Int
-){
-        @Version  var version: Long = 0
+        var stock: Int,
+) {
+    @Version
+    var version: Long = 0
 }
 
 @Repository

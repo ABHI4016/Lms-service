@@ -24,7 +24,7 @@ class LibraryItemServiceSpec extends Specification {
         response.id == null
     }
 
-    def "Should be able to retrieve all items"(){
+    def "Should be able to retrieve all items"() {
         given:
         def item1 = new Book("JK Rowling", "Item-1", "Harry Potter")
         def item2 = new Book("JK Rowling", "Item-1", "Harry Potter")
@@ -32,7 +32,7 @@ class LibraryItemServiceSpec extends Specification {
         when:
         def response = itemService.findAll()
         then:
-        1 * itemRepository.findAll() >> [item1,item2,item3]
+        1 * itemRepository.findAll() >> [item1, item2, item3]
         response.size() == 3
     }
 

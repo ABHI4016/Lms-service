@@ -9,7 +9,7 @@ data class Allocation(
         @Id
         var id: String,
         @DBRef(db = "Sku")
-        val sku: Sku
-){
-        val allocations = mutableListOf<Member>()
+        val sku: Sku,
+) {
+    val allocations = mutableListOf<Member>()
 }
