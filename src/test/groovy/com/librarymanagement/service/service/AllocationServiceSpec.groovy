@@ -29,6 +29,7 @@ class AllocationServiceSpec extends Specification {
         sku.stock = 2
 
         def allocation = new Allocation("alloca-1", sku)
+        allocation.allocations = new LinkedList<>()
         when:
         def response = allocationService.allocate("Member-id-1", "Sku-id-1")
 
@@ -52,9 +53,13 @@ class AllocationServiceSpec extends Specification {
         sku.stock = 2
 
         def allocation1 = new Allocation("alloca-1", sku)
+        allocation1.allocations = new LinkedList<>()
+
         def allocation2 = new Allocation("alloca-1", sku)
+        allocation2.allocations = new LinkedList<>()
+
         when:
-        def response = allocationService.allocate("Member-id-1", "Sku-id-1")
+        allocationService.allocate("Member-id-1", "Sku-id-1")
 
         then:
         1 * mockMemberService.findById("Member-id-1") >> member
@@ -70,7 +75,6 @@ class AllocationServiceSpec extends Specification {
         def member = new IndividualUser("Member-id-1", "John Doe", "Mock Street")
         def sku = new Sku("Sku-id-1", new Book("JK Rowling", "Harry-potter-1", "Harry Potter"))
         sku.stock = 0
-        def allocation = new Allocation("alloca-1", sku)
 
         when:
         allocationService.allocate("Member-id-1", "Sku-id-1")
@@ -78,8 +82,6 @@ class AllocationServiceSpec extends Specification {
         then:
         1 * mockMemberService.findById("Member-id-1") >> member
         1 * mockStockService.findById("Sku-id-1") >> sku
-        1 * mockAllocationRepository.findByAllocationsContaining(member) >> []
-        1 * mockAllocationRepository.findBySkuId("Sku-id-1") >> Optional.of(allocation)
 
 
         thrown CantAllocateToMemberException
@@ -91,7 +93,7 @@ class AllocationServiceSpec extends Specification {
         def sku = new Sku("Sku-id-1", new Book("JK Rowling", "Harry-potter-1", "Harry Potter"))
         sku.stock = 2
         def allocation = new Allocation("alloca-1", sku)
-        allocation.allocations(member)
+        allocation.allocations = [member]
 
         when:
         allocationService.allocate("Member-id-1", "Sku-id-1")

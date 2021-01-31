@@ -23,7 +23,7 @@ class StockServiceSpec extends Specification {
         def response = stockService.createSku(sku)
         then:
         1 * skuRepository.findByItem(item) >> Optional.ofNullable(null)
-        1 * skuRepository.save(sku) >> sku
+        1 * skuRepository.insert(sku) >> sku
         response == sku
     }
 
@@ -44,11 +44,11 @@ class StockServiceSpec extends Specification {
         given:
         def item1 = new Book("JK Rowling", "Item-1", "Harry Potter")
         def sku1 = new Sku("sku-1", item1)
-        sku.stock = 1
+        sku1.stock = 1
 
         def item2 = new Book("JK Rowling", "Item-2", "Harry Potter")
         def sku2 = new Sku("sku-2", item2)
-        sku.stock = 1
+        sku2.stock = 1
 
 
         def skus = [sku1, sku2]

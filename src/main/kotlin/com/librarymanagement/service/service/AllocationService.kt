@@ -5,6 +5,7 @@ import com.librarymanagement.service.model.Member
 import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.stereotype.Repository
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
 
@@ -21,7 +22,7 @@ class AllocationService(
         private val skuService: StockService,
 ) {
 
-//    @Transactional
+    @Transactional
     fun allocate(
             memberId: String,
             skuId: String,
@@ -29,11 +30,12 @@ class AllocationService(
         val member = memberService.findById(memberId)
         val sku = skuService.findById(skuId)
 
-        val currentAllocations: Optional<List<Allocation>> = allocationRepository.findByAllocationsContaining(member)
 
-        if (currentAllocations.isEmpty || currentAllocations.get().size < 2) {
+        if (sku.stock > 0) {
 
-            if (sku.stock > 0) {
+            val currentAllocations: Optional<List<Allocation>> = allocationRepository.findByAllocationsContaining(member)
+
+            if (currentAllocations.isEmpty || currentAllocations.get().size < 2) {
                 val allocation: Allocation = allocationRepository.findBySkuId(skuId)
                         .orElseGet {
                             Allocation(null, sku)
@@ -48,10 +50,10 @@ class AllocationService(
                 }
 
             } else {
-                throw CantAllocateToMemberException("Can't allocate resource with skuId: $skuId to member: $memberId, either already assigned or stock unavailable")
+                throw MaxResourceAlreadyAllocatedException("The member is already allocated max permissible library resources")
             }
         } else {
-            throw MaxResourceAlreadyAllocatedException("The member is already allocated max permissible library resources")
+            throw CantAllocateToMemberException("Can't allocate resource with skuId: $skuId to member: $memberId, either already assigned or stock unavailable")
         }
     }
 }
