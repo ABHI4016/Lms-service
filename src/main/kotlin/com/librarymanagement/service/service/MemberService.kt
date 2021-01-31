@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class MemberService(
-        private val memberRepo: MemberRepo
+        private val memberRepo: MemberRepo,
 ) {
 
 
@@ -15,12 +15,12 @@ class MemberService(
         return memberRepo.insert(member)
     }
 
-    fun all(): List<Member>{
+    fun all(): List<Member> {
         return memberRepo.findAll()
     }
 
-    fun findById(id: String): Member{
-        return memberRepo.findById(id).orElseThrow{
+    fun findById(id: String): Member {
+        return memberRepo.findById(id).orElseThrow {
             throw MemberNotFoundException("Can't find member by id: $id")
         }
     }

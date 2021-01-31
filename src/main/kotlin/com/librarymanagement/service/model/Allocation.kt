@@ -7,9 +7,9 @@ import org.springframework.data.mongodb.core.mapping.Document
 @Document
 data class Allocation(
         @Id
-        var id: String,
-        @DBRef(db = "Sku")
+        var id: String?,
+        @DBRef
         val sku: Sku,
 ) {
-    val allocations = mutableListOf<Member>()
+    lateinit var allocations :MutableList<Member>
 }

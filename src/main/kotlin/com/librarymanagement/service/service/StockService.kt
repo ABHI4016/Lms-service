@@ -28,14 +28,18 @@ class StockService(
         }
     }
 
-    fun getAllSku(): List<Sku> {
+    fun allInStockSku(): List<Sku> {
         return skuRepository.findByStockGreaterThan()
     }
 
     fun findById(skuId: String): Sku {
-        return skuRepository.findById(skuId).orElseThrow{
+        return skuRepository.findById(skuId).orElseThrow {
             throw SkuNotFoundException("Can't find SKU for id: $skuId")
         }
+    }
+
+    fun update(sku: Sku): Sku {
+        return skuRepository.save(sku)
     }
 }
 

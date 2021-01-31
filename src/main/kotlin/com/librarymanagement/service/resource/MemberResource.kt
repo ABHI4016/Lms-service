@@ -22,7 +22,7 @@ class MemberResource(
     }
 
     @GetMapping("/all")
-    fun allMembers(): List<Member>{
+    fun allMembers(): List<Member> {
         return memberService.all()
     }
 

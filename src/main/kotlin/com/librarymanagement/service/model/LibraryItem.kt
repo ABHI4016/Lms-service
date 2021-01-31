@@ -8,7 +8,6 @@ import org.springframework.data.mongodb.core.mapping.DBRef
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.stereotype.Repository
-import java.util.*
 
 
 @JsonTypeInfo(
@@ -38,8 +37,9 @@ data class Sku(
         var id: String?,
         @DBRef
         val item: LibraryItem,
-        var stock: Int,
 ) {
+    var stock: Int = 0
+
     @Version
     var version: Long = 0
 }

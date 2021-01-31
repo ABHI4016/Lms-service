@@ -17,7 +17,8 @@ class StockServiceSpec extends Specification {
     def "Should be able to create a SKU for a new library item"() {
         given:
         def item = new Book("JK Rowling", "Item-1", "Harry Potter")
-        def sku = new Sku("sku-1", item, 1)
+        def sku = new Sku("sku-1", item)
+        sku.stock = 1
         when:
         def response = stockService.createSku(sku)
         then:
@@ -29,7 +30,8 @@ class StockServiceSpec extends Specification {
     def "Should throw SkuAlreadyExistsException when a SKU already exists for an item"() {
         given:
         def item = new Book("JK Rowling", "Item-1", "Harry Potter")
-        def sku = new Sku("sku-1", item, 1)
+        def sku = new Sku("sku-1", item)
+        sku.stock = 1
         when:
         stockService.createSku(sku)
         then:
@@ -41,15 +43,18 @@ class StockServiceSpec extends Specification {
     def "Should return all in stock sku"() {
         given:
         def item1 = new Book("JK Rowling", "Item-1", "Harry Potter")
-        def sku1 = new Sku("sku-1", item1, 1)
+        def sku1 = new Sku("sku-1", item1)
+        sku.stock = 1
 
         def item2 = new Book("JK Rowling", "Item-2", "Harry Potter")
-        def sku2 = new Sku("sku-2", item2, 1)
+        def sku2 = new Sku("sku-2", item2)
+        sku.stock = 1
+
 
         def skus = [sku1, sku2]
 
         when:
-        def response = stockService.getAllSku()
+        def response = stockService.allInStockSku()
 
         then:
         1 * skuRepository.findByStockGreaterThan(0) >> skus
@@ -58,7 +63,7 @@ class StockServiceSpec extends Specification {
 
     def "Should return an empty response in case no in stock sku is found"() {
         when:
-        def response = stockService.getAllSku()
+        def response = stockService.allInStockSku()
 
         then:
         1 * skuRepository.findByStockGreaterThan(0) >> []

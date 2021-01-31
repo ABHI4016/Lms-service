@@ -17,6 +17,6 @@ class SKUResource(
 
     @GetMapping("/all")
     fun findAll(): List<Sku> {
-        return stockService.getAllSku()
+        return stockService.allInStockSku()
     }
 }
