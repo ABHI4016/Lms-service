@@ -15,38 +15,44 @@ class ExceptionHandler {
 
     @ExceptionHandler(SkuAlreadyExistsException::class)
     fun handleSkuAlreadyExistsException(exception: SkuAlreadyExistsException): ResponseEntity<Any> {
-        logger.error(exception.message, exception)
+        logger.error(exception.message)
         return ResponseEntity(mapOf("message" to exception.message), HttpStatus.BAD_REQUEST)
     }
 
     @ExceptionHandler(SkuNotFoundException::class)
     fun handleSkuNotFoundException(exception: SkuNotFoundException): ResponseEntity<Any> {
-        logger.error(exception.message, exception)
+        logger.error(exception.message)
         return ResponseEntity(mapOf("message" to exception.message), HttpStatus.BAD_REQUEST)
     }
 
 
     @ExceptionHandler(CantAllocateToMemberException::class)
     fun handleCantAllocateToMemberException(exception: CantAllocateToMemberException): ResponseEntity<Any> {
-        logger.error(exception.message, exception)
+        logger.error(exception.message)
+        return ResponseEntity(mapOf("message" to exception.message), HttpStatus.BAD_REQUEST)
+    }
+
+    @ExceptionHandler(CantDeAllocateToMemberException::class)
+    fun handleCantDeAllocateToMemberException(exception: CantDeAllocateToMemberException): ResponseEntity<Any> {
+        logger.error(exception.message)
         return ResponseEntity(mapOf("message" to exception.message), HttpStatus.BAD_REQUEST)
     }
 
     @ExceptionHandler(MemberNotFoundException::class)
     fun handleMemberNotFoundException(exception: MemberNotFoundException): ResponseEntity<Any> {
-        logger.error(exception.message, exception)
+        logger.error(exception.message)
         return ResponseEntity(mapOf("message" to exception.message), HttpStatus.BAD_REQUEST)
     }
 
     @ExceptionHandler(MaxResourceAlreadyAllocatedException::class)
     fun handleMaxResourceAlreadyAllocatedException(exception: MaxResourceAlreadyAllocatedException): ResponseEntity<Any> {
-        logger.error(exception.message, exception)
+        logger.error(exception.message)
         return ResponseEntity(mapOf("message" to exception.message), HttpStatus.BAD_REQUEST)
     }
 
     @ExceptionHandler(ItemNotFoundException::class)
     fun handleItemNotFoundException(exception: ItemNotFoundException): ResponseEntity<Any> {
-        logger.error(exception.message, exception)
+        logger.error(exception.message)
         return ResponseEntity(mapOf("message" to exception.message), HttpStatus.BAD_REQUEST)
     }
 

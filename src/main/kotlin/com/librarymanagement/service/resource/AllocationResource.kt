@@ -2,10 +2,7 @@ package com.librarymanagement.service.resource
 
 import com.librarymanagement.service.model.Allocation
 import com.librarymanagement.service.service.AllocationService
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 
 @RestController
@@ -20,5 +17,13 @@ class AllocationResource(
             @PathVariable skuId: String,
     ): Allocation {
         return allocationService.allocate(memberId, skuId)
+    }
+
+    @DeleteMapping("member/{memberId}/sku/{skuId}")
+    fun deAllocate(
+            @PathVariable memberId: String,
+            @PathVariable skuId: String,
+    ): Allocation {
+        return allocationService.deAllocate(memberId, skuId)
     }
 }

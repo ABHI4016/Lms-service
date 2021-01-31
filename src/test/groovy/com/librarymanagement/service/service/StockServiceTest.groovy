@@ -5,7 +5,7 @@ import com.librarymanagement.service.model.LibraryItem
 import com.librarymanagement.service.model.Sku
 import spock.lang.Specification
 
-class StockServiceSpec extends Specification {
+class StockServiceTest extends Specification {
     StockService stockService
     SkuRepository skuRepository
 

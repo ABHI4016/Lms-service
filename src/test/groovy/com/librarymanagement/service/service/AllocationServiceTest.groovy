@@ -6,7 +6,7 @@ import com.librarymanagement.service.model.IndividualUser
 import com.librarymanagement.service.model.Sku
 import spock.lang.Specification
 
-class AllocationServiceSpec extends Specification {
+class AllocationServiceTest extends Specification {
 
     AllocationService allocationService
     MemberService mockMemberService
@@ -29,7 +29,6 @@ class AllocationServiceSpec extends Specification {
         sku.stock = 2
 
         def allocation = new Allocation("alloca-1", sku)
-        allocation.allocations = new LinkedList<>()
         when:
         def response = allocationService.allocate("Member-id-1", "Sku-id-1")
 
@@ -53,10 +52,7 @@ class AllocationServiceSpec extends Specification {
         sku.stock = 2
 
         def allocation1 = new Allocation("alloca-1", sku)
-        allocation1.allocations = new LinkedList<>()
-
         def allocation2 = new Allocation("alloca-1", sku)
-        allocation2.allocations = new LinkedList<>()
 
         when:
         allocationService.allocate("Member-id-1", "Sku-id-1")

@@ -40,12 +40,12 @@ class AllocationService(
                         .orElseGet {
                             Allocation(null, sku)
                         }
-                if( !allocation.allocations.contains(member)){
+                if (!allocation.allocations.contains(member)) {
                     sku.stock--
                     skuService.update(sku)
                     allocation.allocations.add(member)
                     return allocationRepository.save(allocation)
-                }else{
+                } else {
                     throw CantAllocateToMemberException("Can't allocate resource with skuId: $skuId to member: $memberId, either already assigned or stock unavailable")
                 }
 
@@ -56,8 +56,32 @@ class AllocationService(
             throw CantAllocateToMemberException("Can't allocate resource with skuId: $skuId to member: $memberId, either already assigned or stock unavailable")
         }
     }
+
+    @Transactional
+    fun deAllocate(
+            memberId: String,
+            skuId: String,
+    ): Allocation {
+        val member = memberService.findById(memberId)
+        val sku = skuService.findById(skuId)
+
+
+            val allocation: Allocation = allocationRepository.findBySkuId(skuId)
+                    .orElseGet {
+                        Allocation(null, sku)
+                    }
+            if (allocation.allocations.contains(member)) {
+                sku.stock++
+                skuService.update(sku)
+                allocation.allocations.remove(member)
+                return allocationRepository.save(allocation)
+            } else {
+                throw CantDeAllocateToMemberException("Can't allocate resource with skuId: $skuId to member: $memberId, the resource is not assigned")
+            }
+    }
 }
 
 class CantAllocateToMemberException(override val message: String) : Throwable()
+class CantDeAllocateToMemberException(override val message: String) : Throwable()
 
 class MaxResourceAlreadyAllocatedException(override val message: String) : Throwable()

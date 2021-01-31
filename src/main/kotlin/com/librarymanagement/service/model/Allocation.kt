@@ -11,5 +11,5 @@ data class Allocation(
         @DBRef
         val sku: Sku,
 ) {
-    lateinit var allocations :MutableList<Member>
+    var allocations :MutableList<Member> = mutableListOf()
 }

@@ -4,7 +4,7 @@ import com.librarymanagement.service.model.Book
 import com.librarymanagement.service.model.ItemRepository
 import spock.lang.Specification
 
-class LibraryItemServiceSpec extends Specification {
+class LibraryItemServiceTest extends Specification {
     LibraryItemService itemService
     ItemRepository itemRepository
 
