@@ -10,6 +10,8 @@ data class Allocation(
         var id: String?,
         @DBRef
         val sku: Sku,
-) {
-    var allocations :MutableList<Member> = mutableListOf()
+        @DBRef
+        val member: Member
+){
+    var isActive = true
 }

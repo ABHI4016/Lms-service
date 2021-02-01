@@ -11,8 +11,8 @@ import java.util.*
 
 @Repository
 interface AllocationRepository : MongoRepository<Allocation, String> {
-    fun findBySkuId(skuId: String): Optional<Allocation>
-    fun findByAllocationsContaining(member: Member): Optional<List<Allocation>>
+    fun findBySkuIdAndMemberAndIsActive(skuId: String, member: Member, isActive: Boolean = true): Optional<Allocation>
+    fun findByMemberAndIsActive(member: Member, isActive: Boolean = true): Optional<List<Allocation>>
 }
 
 @Service
@@ -30,23 +30,18 @@ class AllocationService(
         val member = memberService.findById(memberId)
         val sku = skuService.findById(skuId)
 
-
         if (sku.stock > 0) {
-
-            val currentAllocations: Optional<List<Allocation>> = allocationRepository.findByAllocationsContaining(member)
+            val currentAllocations: Optional<List<Allocation>> = allocationRepository.findByMemberAndIsActive(member)
 
             if (currentAllocations.isEmpty || currentAllocations.get().size < 2) {
-                val allocation: Allocation = allocationRepository.findBySkuId(skuId)
-                        .orElseGet {
-                            Allocation(null, sku)
-                        }
-                if (!allocation.allocations.contains(member)) {
+                val allocation = allocationRepository.findBySkuIdAndMemberAndIsActive(skuId, member)
+                if (allocation.isEmpty) {
                     sku.stock--
                     skuService.update(sku)
-                    allocation.allocations.add(member)
-                    return allocationRepository.save(allocation)
+                    val newAllocation = Allocation(null, sku, member)
+                    return allocationRepository.save(newAllocation)
                 } else {
-                    throw CantAllocateToMemberException("Can't allocate resource with skuId: $skuId to member: $memberId, either already assigned or stock unavailable")
+                    throw CantAllocateToMemberException("Can't allocate resource with skuId: $skuId to member: $memberId, resource is already assigned")
                 }
 
             } else {
@@ -65,19 +60,16 @@ class AllocationService(
         val member = memberService.findById(memberId)
         val sku = skuService.findById(skuId)
 
-
-            val allocation: Allocation = allocationRepository.findBySkuId(skuId)
-                    .orElseGet {
-                        Allocation(null, sku)
-                    }
-            if (allocation.allocations.contains(member)) {
-                sku.stock++
-                skuService.update(sku)
-                allocation.allocations.remove(member)
-                return allocationRepository.save(allocation)
-            } else {
-                throw CantDeAllocateToMemberException("Can't allocate resource with skuId: $skuId to member: $memberId, the resource is not assigned")
-            }
+        val allocationOptional = allocationRepository.findBySkuIdAndMemberAndIsActive(skuId, member)
+        if (allocationOptional.isPresent) {
+            sku.stock++
+            skuService.update(sku)
+            val allocation = allocationOptional.get()
+            allocation.isActive = false
+            return allocationRepository.save(allocation)
+        } else {
+            throw CantDeAllocateToMemberException("Can't allocate resource with skuId: $skuId to member: $memberId, the resource is not assigned")
+        }
     }
 }
 

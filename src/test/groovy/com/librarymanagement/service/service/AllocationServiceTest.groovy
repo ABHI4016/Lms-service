@@ -28,20 +28,20 @@ class AllocationServiceTest extends Specification {
         def sku = new Sku("Sku-id-1", new Book("JK Rowling", "Harry-potter-1", "Harry Potter"))
         sku.stock = 2
 
-        def allocation = new Allocation("alloca-1", sku)
+        def allocation = new Allocation("alloca-1", sku, member)
         when:
         def response = allocationService.allocate("Member-id-1", "Sku-id-1")
 
         then:
         1 * mockMemberService.findById("Member-id-1") >> member
         1 * mockStockService.findById("Sku-id-1") >> sku
-        1 * mockAllocationRepository.findByAllocationsContaining(member) >> []
-        1 * mockAllocationRepository.findBySkuId("Sku-id-1") >> Optional.of(allocation)
+        1 * mockAllocationRepository.findByMemberAndIsActive(member, true) >> []
+        1 * mockAllocationRepository.findBySkuIdAndMemberAndIsActive("Sku-id-1", member, true) >> Optional.ofNullable(null)
         1 * mockStockService.update(sku) >> sku
         1 * mockAllocationRepository.save(_ as Allocation) >> allocation
 
         response
-        response.allocations.contains(member)
+        response.member == member
         response.sku == sku
     }
 
@@ -51,8 +51,8 @@ class AllocationServiceTest extends Specification {
         def sku = new Sku("Sku-id-1", new Book("JK Rowling", "Harry-potter-1", "Harry Potter"))
         sku.stock = 2
 
-        def allocation1 = new Allocation("alloca-1", sku)
-        def allocation2 = new Allocation("alloca-1", sku)
+        def allocation1 = new Allocation("alloca-1", sku, member)
+        def allocation2 = new Allocation("alloca-2", sku, member)
 
         when:
         allocationService.allocate("Member-id-1", "Sku-id-1")
@@ -60,7 +60,7 @@ class AllocationServiceTest extends Specification {
         then:
         1 * mockMemberService.findById("Member-id-1") >> member
         1 * mockStockService.findById("Sku-id-1") >> sku
-        1 * mockAllocationRepository.findByAllocationsContaining(member) >> [allocation1, allocation2]
+        1 * mockAllocationRepository.findByMemberAndIsActive(member, true) >> [allocation1, allocation2]
 
 
         thrown MaxResourceAlreadyAllocatedException
@@ -88,8 +88,7 @@ class AllocationServiceTest extends Specification {
         def member = new IndividualUser("Member-id-1", "John Doe", "Mock Street")
         def sku = new Sku("Sku-id-1", new Book("JK Rowling", "Harry-potter-1", "Harry Potter"))
         sku.stock = 2
-        def allocation = new Allocation("alloca-1", sku)
-        allocation.allocations = [member]
+        def allocation = new Allocation("alloca-1", sku, member)
 
         when:
         allocationService.allocate("Member-id-1", "Sku-id-1")
@@ -97,8 +96,8 @@ class AllocationServiceTest extends Specification {
         then:
         1 * mockMemberService.findById("Member-id-1") >> member
         1 * mockStockService.findById("Sku-id-1") >> sku
-        1 * mockAllocationRepository.findByAllocationsContaining(member) >> []
-        1 * mockAllocationRepository.findBySkuId("Sku-id-1") >> Optional.of(allocation)
+        1 * mockAllocationRepository.findByMemberAndIsActive(member, true) >> Optional.of([allocation])
+        1 * mockAllocationRepository.findBySkuIdAndMemberAndIsActive("Sku-id-1", member, true) >> Optional.of(allocation)
 
 
         thrown CantAllocateToMemberException
