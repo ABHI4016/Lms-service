@@ -13,6 +13,7 @@ import java.util.*
 interface AllocationRepository : MongoRepository<Allocation, String> {
     fun findBySkuIdAndMemberAndIsActive(skuId: String, member: Member, isActive: Boolean = true): Optional<Allocation>
     fun findByMemberAndIsActive(member: Member, isActive: Boolean = true): Optional<List<Allocation>>
+    fun findByMemberIdAndIsActive(memberId: String,active: Boolean = true): List<Allocation>
 }
 
 @Service
@@ -71,9 +72,12 @@ class AllocationService(
             throw CantDeAllocateToMemberException("Can't allocate resource with skuId: $skuId to member: $memberId, the resource is not assigned")
         }
     }
+
+    fun getByMemberIdAndIsActive(memberId: String, active: Boolean): List<Allocation> {
+        return allocationRepository.findByMemberIdAndIsActive(memberId,active )
+    }
 }
 
 class CantAllocateToMemberException(override val message: String) : Throwable()
 class CantDeAllocateToMemberException(override val message: String) : Throwable()
-
 class MaxResourceAlreadyAllocatedException(override val message: String) : Throwable()
