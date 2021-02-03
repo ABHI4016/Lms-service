@@ -3,7 +3,6 @@ package com.librarymanagement.service.resource
 import com.librarymanagement.service.model.Allocation
 import com.librarymanagement.service.service.AllocationService
 import org.springframework.web.bind.annotation.*
-import javax.websocket.server.PathParam
 
 
 @RestController
@@ -17,7 +16,7 @@ class AllocationResource(
             @PathVariable memberId: String,
             @RequestParam(value = "isActive", defaultValue = true.toString(), required = false) isActive: Boolean = true
     ): List<Allocation>{
-        return  allocationService.getByMemberIdAndIsActive(memberId, isActive)
+        return  allocationService.getByMemberId(memberId, isActive)
     }
 
     @PutMapping("member/{memberId}/sku/{skuId}")
@@ -28,6 +27,7 @@ class AllocationResource(
         return allocationService.allocate(memberId, skuId)
     }
 
+    @CrossOrigin()
     @DeleteMapping("member/{memberId}/sku/{skuId}")
     fun deAllocate(
             @PathVariable memberId: String,

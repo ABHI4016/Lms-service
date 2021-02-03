@@ -7,17 +7,14 @@ import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.stereotype.Repository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.*
-import java.util.stream.Collector
-import java.util.stream.Collectors
-import java.util.stream.Stream
+import java.time.LocalDateTime
 
 
 @Repository
 interface AllocationRepository : MongoRepository<Allocation, String> {
     fun findBySkuIdAndMemberAndIsActive(skuId: String, member: Member, isActive: Boolean = true): Allocation?
     fun findByMemberAndIsActive(member: Member, isActive: Boolean = true): List<Allocation>?
-    fun findByMemberIdAndIsActive(memberId: String, active: Boolean = true): List<Allocation>?
+    fun findByMemberIdOrderByIsActiveDesc(memberId: String): List<Allocation>?
 }
 
 @Service
@@ -37,7 +34,6 @@ class AllocationService(
     ): Allocation {
         val member = memberService.findById(memberId)
         val sku = skuService.findById(skuId)
-
 
         if (sku.stock > 0) {
             val currentAllocations: List<Allocation>? = allocationRepository.findByMemberAndIsActive(member)
@@ -74,14 +70,15 @@ class AllocationService(
             sku.stock++
             skuService.update(sku)
             it.isActive = false
+            it.lastUpdated = LocalDateTime.now()
             return allocationRepository.save(it)
         }
 
         throw CantDeAllocateToMemberException("Can't allocate resource with skuId: $skuId to member: $memberId, the resource is not assigned")
     }
 
-    fun getByMemberIdAndIsActive(memberId: String, active: Boolean): List<Allocation> {
-        return allocationRepository.findByMemberIdAndIsActive(memberId, active) ?: mutableListOf()
+    fun getByMemberId(memberId: String, active: Boolean): List<Allocation> {
+        return allocationRepository.findByMemberIdOrderByIsActiveDesc(memberId) ?: mutableListOf()
     }
 }
 
