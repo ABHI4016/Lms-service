@@ -2,18 +2,22 @@ package com.librarymanagement.service.service
 
 import com.librarymanagement.service.model.Allocation
 import com.librarymanagement.service.model.Member
+import com.librarymanagement.service.model.Sku
 import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.stereotype.Repository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
+import java.util.stream.Collector
+import java.util.stream.Collectors
+import java.util.stream.Stream
 
 
 @Repository
 interface AllocationRepository : MongoRepository<Allocation, String> {
-    fun findBySkuIdAndMemberAndIsActive(skuId: String, member: Member, isActive: Boolean = true): Optional<Allocation>
-    fun findByMemberAndIsActive(member: Member, isActive: Boolean = true): Optional<List<Allocation>>
-    fun findByMemberIdAndIsActive(memberId: String,active: Boolean = true): List<Allocation>
+    fun findBySkuIdAndMemberAndIsActive(skuId: String, member: Member, isActive: Boolean = true): Allocation?
+    fun findByMemberAndIsActive(member: Member, isActive: Boolean = true): List<Allocation>?
+    fun findByMemberIdAndIsActive(memberId: String, active: Boolean = true): List<Allocation>?
 }
 
 @Service
@@ -22,6 +26,9 @@ class AllocationService(
         private val allocationRepository: AllocationRepository,
         private val skuService: StockService,
 ) {
+    companion object {
+        fun generate(sku: Sku, member: Member) = Allocation(null, sku, member)
+    }
 
     @Transactional
     fun allocate(
@@ -31,19 +38,21 @@ class AllocationService(
         val member = memberService.findById(memberId)
         val sku = skuService.findById(skuId)
 
-        if (sku.stock > 0) {
-            val currentAllocations: Optional<List<Allocation>> = allocationRepository.findByMemberAndIsActive(member)
 
-            if (currentAllocations.isEmpty || currentAllocations.get().size < 2) {
+        if (sku.stock > 0) {
+            val currentAllocations: List<Allocation>? = allocationRepository.findByMemberAndIsActive(member)
+
+            if (currentAllocations.isNullOrEmpty() || currentAllocations.size < 2) {
                 val allocation = allocationRepository.findBySkuIdAndMemberAndIsActive(skuId, member)
-                if (allocation.isEmpty) {
-                    sku.stock--
-                    skuService.update(sku)
-                    val newAllocation = Allocation(null, sku, member)
-                    return allocationRepository.save(newAllocation)
-                } else {
+
+                allocation?.let {
                     throw CantAllocateToMemberException("Can't allocate resource with skuId: $skuId to member: $memberId, resource is already assigned")
                 }
+
+                sku.stock--
+                skuService.update(sku)
+                return allocationRepository.save(generate(sku, member))
+
 
             } else {
                 throw MaxResourceAlreadyAllocatedException("The member is already allocated max permissible library resources")
@@ -61,20 +70,18 @@ class AllocationService(
         val member = memberService.findById(memberId)
         val sku = skuService.findById(skuId)
 
-        val allocationOptional = allocationRepository.findBySkuIdAndMemberAndIsActive(skuId, member)
-        if (allocationOptional.isPresent) {
+        allocationRepository.findBySkuIdAndMemberAndIsActive(skuId, member)?.let {
             sku.stock++
             skuService.update(sku)
-            val allocation = allocationOptional.get()
-            allocation.isActive = false
-            return allocationRepository.save(allocation)
-        } else {
-            throw CantDeAllocateToMemberException("Can't allocate resource with skuId: $skuId to member: $memberId, the resource is not assigned")
+            it.isActive = false
+            return allocationRepository.save(it)
         }
+
+        throw CantDeAllocateToMemberException("Can't allocate resource with skuId: $skuId to member: $memberId, the resource is not assigned")
     }
 
     fun getByMemberIdAndIsActive(memberId: String, active: Boolean): List<Allocation> {
-        return allocationRepository.findByMemberIdAndIsActive(memberId,active )
+        return allocationRepository.findByMemberIdAndIsActive(memberId, active) ?: mutableListOf()
     }
 }
 

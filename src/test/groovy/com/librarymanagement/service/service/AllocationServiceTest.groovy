@@ -36,7 +36,7 @@ class AllocationServiceTest extends Specification {
         1 * mockMemberService.findById("Member-id-1") >> member
         1 * mockStockService.findById("Sku-id-1") >> sku
         1 * mockAllocationRepository.findByMemberAndIsActive(member, true) >> []
-        1 * mockAllocationRepository.findBySkuIdAndMemberAndIsActive("Sku-id-1", member, true) >> Optional.ofNullable(null)
+        1 * mockAllocationRepository.findBySkuIdAndMemberAndIsActive("Sku-id-1", member, true) >> null
         1 * mockStockService.update(sku) >> sku
         1 * mockAllocationRepository.save(_ as Allocation) >> allocation
 
@@ -96,8 +96,8 @@ class AllocationServiceTest extends Specification {
         then:
         1 * mockMemberService.findById("Member-id-1") >> member
         1 * mockStockService.findById("Sku-id-1") >> sku
-        1 * mockAllocationRepository.findByMemberAndIsActive(member, true) >> Optional.of([allocation])
-        1 * mockAllocationRepository.findBySkuIdAndMemberAndIsActive("Sku-id-1", member, true) >> Optional.of(allocation)
+        1 * mockAllocationRepository.findByMemberAndIsActive(member, true) >> [allocation]
+        1 * mockAllocationRepository.findBySkuIdAndMemberAndIsActive("Sku-id-1", member, true) >> allocation
 
 
         thrown CantAllocateToMemberException
