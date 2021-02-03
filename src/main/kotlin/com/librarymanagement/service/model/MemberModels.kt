@@ -1,5 +1,6 @@
 package com.librarymanagement.service.model
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import org.springframework.data.annotation.Id
@@ -19,6 +20,8 @@ abstract class Member(
         @Id
         var id: String?,
         var name: String,
+        val userName: String,
+        var password: String
 ){
         override fun equals(other: Any?): Boolean {
                 if (this === other) return true
@@ -41,4 +44,7 @@ class IndividualUser(
         id: String?,
         name: String,
         var address: String,
-) : Member(id, name)
+        userName: String,
+        password: String
+) : Member(id, name, userName, password){
+}

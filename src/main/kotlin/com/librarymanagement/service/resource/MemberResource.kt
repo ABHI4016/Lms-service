@@ -7,8 +7,6 @@ import org.springframework.stereotype.Repository
 import org.springframework.web.bind.annotation.*
 
 
-@Repository
-interface MemberRepo : MongoRepository<Member, String>
 
 @RestController
 @RequestMapping("member")
@@ -21,6 +19,11 @@ class MemberResource(
         return memberService.add(member)
     }
 
+    @PostMapping("login")
+    fun login(@RequestBody loginRequest: LoginRequest ): Member {
+        return memberService.login(loginRequest.userName, loginRequest.password)
+    }
+
     @GetMapping("/all")
     fun allMembers(): List<Member> {
         return memberService.all()
@@ -28,3 +31,5 @@ class MemberResource(
 
 
 }
+
+class LoginRequest(val userName: String, val password: String)

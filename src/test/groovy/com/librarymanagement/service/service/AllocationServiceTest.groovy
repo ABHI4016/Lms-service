@@ -24,7 +24,7 @@ class AllocationServiceTest extends Specification {
 
     def "allocate: Should allocate a resource if allocation criteria is met"() {
         given:
-        def member = new IndividualUser("Member-id-1", "John Doe", "Mock Street")
+        def member = new IndividualUser("Member-id-1", "John Doe", "Mock Street", "mid1","password")
         def sku = new Sku("Sku-id-1", new Book("JK Rowling", "Harry-potter-1", "Harry Potter"))
         sku.stock = 2
 
@@ -47,7 +47,7 @@ class AllocationServiceTest extends Specification {
 
     def "allocate: Should throw MaxResourceAllocatedException if the user has max allowed allocations"() {
         given:
-        def member = new IndividualUser("Member-id-1", "John Doe", "Mock Street")
+        def member = new IndividualUser("Member-id-1", "John Doe", "Mock Street", "mid1","password")
         def sku = new Sku("Sku-id-1", new Book("JK Rowling", "Harry-potter-1", "Harry Potter"))
         sku.stock = 2
 
@@ -68,7 +68,7 @@ class AllocationServiceTest extends Specification {
 
     def "allocate: Should throw CanAllocateToMemberException if the stock is unavailable"() {
         given:
-        def member = new IndividualUser("Member-id-1", "John Doe", "Mock Street")
+        def member = new IndividualUser("Member-id-1", "John Doe", "Mock Street", "mid1","password")
         def sku = new Sku("Sku-id-1", new Book("JK Rowling", "Harry-potter-1", "Harry Potter"))
         sku.stock = 0
 
@@ -85,7 +85,7 @@ class AllocationServiceTest extends Specification {
 
     def "allocate: Should throw CanAllocateToMemberException if the resource is already allocated"() {
         given:
-        def member = new IndividualUser("Member-id-1", "John Doe", "Mock Street")
+        def member = new IndividualUser("Member-id-1", "John Doe", "Mock Street", "mid1","password")
         def sku = new Sku("Sku-id-1", new Book("JK Rowling", "Harry-potter-1", "Harry Potter"))
         sku.stock = 2
         def allocation = new Allocation("alloca-1", sku, member)
